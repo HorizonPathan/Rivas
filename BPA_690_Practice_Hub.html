@@ -1,0 +1,620 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BPA 690 Practice Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@500;600&family=Source+Sans+3:wght@400;600;700&display=swap">
+<style>
+/* Layout: a front-desk chart folder. Folder-tab nav on top, one working surface below, mono labels like a chart label strip. */
+:root{
+  --bg:#EDF0F4; --surface:#FFFFFF; --ink:#14202E; --muted:#556474; --line:#D2D9E1;
+  --accent:#1D4E89; --on-accent:#FFFFFF; --soft:#E2E9F2; --gold:#9A6512; --goldbg:#F6EAD0;
+  --good:#1B7448; --goodbg:#DDF0E5; --bad:#B0352D; --badbg:#F7E0DD;
+  --display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1620; --surface:#162231; --ink:#E5ECF4; --muted:#9BA9B9; --line:#293A4E;
+  --accent:#86B5F2; --on-accent:#0E1620; --soft:#1D2D42; --gold:#E4B055; --goldbg:#3A2E16;
+  --good:#5FD095; --goodbg:#14301F; --bad:#F2918A; --badbg:#3A1C1A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1620; --surface:#162231; --ink:#E5ECF4; --muted:#9BA9B9; --line:#293A4E;
+  --accent:#86B5F2; --on-accent:#0E1620; --soft:#1D2D42; --gold:#E4B055; --goldbg:#3A2E16;
+  --good:#5FD095; --goodbg:#14301F; --bad:#F2918A; --badbg:#3A1C1A; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:400 17px/1.5 var(--body);
+  padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--display);line-height:1.15;margin:0;text-wrap:balance}
+h1{font-size:clamp(28px,5vw,40px);font-weight:700;letter-spacing:-.01em}
+h2{font-size:24px;font-weight:700}
+h3{font-size:18px;font-weight:600}
+p{margin:0}
+.label{font:600 12px/1.3 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+header{display:flex;flex-direction:column;gap:12px}
+.facts{display:flex;flex-wrap:wrap;gap:8px 16px;padding:10px 12px;border:1px dashed var(--line);border-radius:6px;background:var(--surface)}
+.facts span{font:500 13px/1.3 var(--mono);color:var(--muted)}
+.facts b{color:var(--ink);font-weight:600}
+
+nav{display:flex;gap:4px;overflow-x:auto;border-bottom:2px solid var(--line);padding-bottom:0;scrollbar-width:thin}
+nav button{flex:0 0 auto;background:transparent;border:1px solid transparent;border-bottom:none;border-radius:8px 8px 0 0;
+  padding:10px 16px;font:600 15px/1 var(--body);color:var(--muted);margin-bottom:-2px}
+nav button:hover{color:var(--ink)}
+nav button[aria-current="page"]{background:var(--surface);border-color:var(--line);color:var(--ink);border-bottom:2px solid var(--surface)}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:0 0 10px 10px;padding:20px;display:flex;flex-direction:column;gap:20px;min-width:0}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.row.between{justify-content:space-between}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.card{border:1px solid var(--line);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--surface);min-width:0}
+.btn{background:var(--accent);color:var(--on-accent);border:1px solid var(--accent);border-radius:8px;padding:10px 16px;font-weight:700}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost:hover{background:var(--soft)}
+.btn.sm{padding:6px 12px;font-size:15px}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:transparent;border-radius:999px;padding:6px 14px;font-size:15px;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+
+.bar{height:8px;background:var(--soft);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:4px}
+.bar.good i{background:var(--good)}
+.stat{font:600 13px/1.3 var(--mono);color:var(--muted);font-variant-numeric:tabular-nums}
+
+.qtext{font-size:20px;line-height:1.4;font-weight:600}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{display:flex;gap:12px;align-items:flex-start;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 14px;width:100%}
+.opt:hover:not([disabled]){border-color:var(--accent);background:var(--soft)}
+.opt .k{font:600 13px/1.6 var(--mono);color:var(--muted);flex:0 0 auto}
+.opt.sel{border-color:var(--accent);background:var(--soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.opt.ok{border-color:var(--good);background:var(--goodbg)}
+.opt.no{border-color:var(--bad);background:var(--badbg)}
+.opt[disabled]{cursor:default}
+.fb{border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.fb.ok{background:var(--goodbg);border:1px solid var(--good)}
+.fb.no{background:var(--badbg);border:1px solid var(--bad)}
+.fb b{font-family:var(--display)}
+.tag{display:inline-block;font:600 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;padding:4px 8px;border-radius:4px;background:var(--soft);color:var(--muted)}
+.tag.gold{background:var(--goldbg);color:var(--gold)}
+
+.flash{min-height:230px;border:1px solid var(--line);border-radius:12px;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;
+  text-align:center;padding:24px;width:100%;box-shadow:0 1px 0 var(--line),0 6px 0 -3px var(--soft)}
+.flash .big{font:700 clamp(24px,5vw,32px)/1.2 var(--display)}
+.flash.back{background:var(--soft)}
+.flash .def{font-size:20px;line-height:1.4;max-width:34ch}
+
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+.mcol{display:flex;flex-direction:column;gap:8px;min-width:0}
+.m{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface);text-align:left;font-size:15px;line-height:1.35}
+.m:hover:not([disabled]){border-color:var(--accent)}
+.m.sel{border-color:var(--accent);background:var(--soft);box-shadow:inset 0 0 0 1px var(--accent)}
+.m.done{border-color:var(--good);background:var(--goodbg);cursor:default}
+.m.bad{border-color:var(--bad);background:var(--badbg)}
+@media (max-width:560px){.mgrid{gap:8px}.m{font-size:14px;padding:8px}}
+
+.nav-q{display:flex;flex-wrap:wrap;gap:6px}
+.nq{width:36px;height:36px;border-radius:6px;border:1px solid var(--line);background:transparent;font:600 13px var(--mono);position:relative;font-variant-numeric:tabular-nums}
+.nq.ans{background:var(--soft);border-color:var(--accent)}
+.nq.cur{outline:3px solid var(--accent);outline-offset:1px}
+.nq.flag::after{content:"";position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--gold)}
+.timer{font:600 22px/1 var(--mono);font-variant-numeric:tabular-nums;padding:8px 12px;border-radius:8px;background:var(--soft)}
+.timer.low{background:var(--badbg);color:var(--bad)}
+.score{font:700 56px/1 var(--display)}
+.crow{display:grid;grid-template-columns:minmax(0,200px) 1fr 56px;gap:10px;align-items:center}
+.crow .n{font-size:15px;font-weight:600}
+.crow .v{font:600 13px var(--mono);text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:560px){.crow{grid-template-columns:1fr 56px}.crow .bar{grid-column:1/-1;order:3}}
+.review{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:6px}
+.confirm{background:var(--goldbg);border:1px solid var(--gold);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.scn{width:100%;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.scn:hover{border-color:var(--accent);background:var(--soft)}
+footer{font-size:14px;color:var(--muted)}
+.shake{animation:shake .25s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+@media (prefers-reduced-motion:reduce){.shake{animation:none}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="label">Business Professionals of America · Workplace Skills Assessment</div>
+    <h1>Event 690 Practice Hub</h1>
+    <p class="muted">Healthcare &amp; Human Services Concepts (Open). Original practice items built on the five published competencies.</p>
+    <div class="facts" aria-label="Event facts">
+      <span><b>Format</b> objective test</span>
+      <span><b>Testing time</b> up to 60 min</span>
+      <span><b>Reference materials</b> not allowed</span>
+      <span><b>AI</b> not allowed</span>
+      <span><b>Calculator</b> optional, cordless</span>
+    </div>
+  </header>
+  <div>
+    <nav id="nav" aria-label="Sections"></nav>
+    <main class="panel" id="app"></main>
+  </div>
+  <footer>These are original practice questions, not past test items. The real exam may word or weight topics differently, so also review the current event guidelines.</footer>
+</div>
+
+<script>
+/* Question bank: [competency, question, correct, wrong1, wrong2, wrong3, explanation] */
+const QB = [
+/* 1 Roles, settings, organization */
+[1,"Which staff member is usually responsible for greeting patients, checking them in, verifying demographic information, and answering phones?","Medical receptionist (front desk staff)","Medical coder","Phlebotomist","Radiologic technologist","The front desk is the first point of contact. Coders handle diagnosis and procedure codes, phlebotomists draw blood, and radiologic technologists perform imaging."],
+[1,"A patient sees their own family doctor for a yearly physical and routine vaccines. What level of care is this?","Primary care","Secondary care","Tertiary care","Quaternary care","Primary care is the first, ongoing point of contact for routine and preventive needs."],
+[1,"A patient is referred to a specialized hospital for a heart transplant. This is an example of which level of care?","Tertiary care","Primary care","Preventive care","Secondary care","Tertiary care is highly specialized, complex care, often in a hospital with advanced equipment and specialists."],
+[1,"Which setting provides comfort-focused care for people with a terminal illness and support for their families?","Hospice","Urgent care center","Ambulatory surgery center","Acute-care hospital","Hospice focuses on comfort and quality of life rather than cure."],
+[1,"Who is typically responsible for daily operations, staffing, and budgets in a medical office?","Office manager (practice administrator)","Medical assistant","Phlebotomist","Medical transcriptionist","The office manager oversees the business side of the practice."],
+[1,"A medical coder's main job is to:","Translate diagnoses and procedures into standardized codes","Greet patients and collect copayments","Take vital signs in the exam room","Schedule patients with specialists","Coders assign ICD-10-CM, CPT, and HCPCS codes so claims can be billed."],
+[1,"An employee has a concern about a workplace procedure. Following the chain of command, who should hear about it first?","Their immediate supervisor","The practice owner","An outside regulatory agency","A patient","The chain of command routes issues through the next level of authority, starting with the immediate supervisor."],
+[1,"Which statement describes a nonprofit hospital?","It reinvests surplus revenue into the organization and community","It pays profits to shareholders","It is owned and operated by the state government only","It can only treat patients who have Medicaid","Nonprofit organizations reinvest any surplus rather than distributing profit to owners or shareholders."],
+[1,"Which patient is best suited for an urgent care center?","A person with a sprained ankle who needs same-day care","A person having stroke symptoms","A person who needs lifelong management of diabetes","A person who needs an organ transplant","Urgent care treats non-life-threatening problems that need prompt attention. Stroke symptoms need 911 and the emergency department."],
+[1,"An accountable care organization (ACO) is:","A group of providers who coordinate care and share responsibility for the quality and cost of care for a patient population","A company that sends electronic claims to insurers","A federal agency that licenses physicians","A type of billing software","ACOs aim to improve coordination and lower costs while maintaining quality."],
+
+/* 2 Patient interaction, scheduling, workflow */
+[2,"Which is an open-ended question?","'Can you tell me what brought you in today?'","'Are you here for your back pain?'","'Did you take your medicine this morning?'","'Is the pain sharp?'","Open-ended questions cannot be answered with yes or no, so they draw out more information."],
+[2,"Three patients are scheduled at the top of each hour and seen in order of arrival. This is:","Wave scheduling","Stream scheduling","Open office hours","Double booking","Wave scheduling books several patients at the start of the hour to absorb no-shows and late arrivals."],
+[2,"A patient is upset about a long wait. What is the best response?","Acknowledge the frustration, apologize for the delay, and give an honest estimate of the wait","Tell the patient that everyone has to wait","Ask the patient to sit down and be quiet","Tell the patient to come back another day without explanation","Empathy, an apology, and honest information help de-escalate the situation."],
+[2,"A caller says she has chest pain spreading to her left arm and is short of breath. What should you do?","Tell her to call 911 right away and alert clinical staff","Offer the next available appointment","Transfer her to the billing department","Take a message for the nurse to return after lunch","These are possible heart attack symptoms. Emergencies are never handled by scheduling a future visit."],
+[2,"A patient misses an appointment without calling. What is the best practice?","Document the no-show in the record and try to contact the patient to reschedule","Delete the appointment so no record exists","Discharge the patient from the practice immediately","Ignore it","No-shows are documented because they are part of the patient's care history and may matter legally."],
+[2,"What is the purpose of triage?","To sort patients by the urgency of their needs","To sort insurance claims by payer","To decide how much a patient owes","To organize files alphabetically","Triage prioritizes who needs care first."],
+[2,"Before discussing an appointment over the phone, which is the best way to confirm you are speaking with the patient?","Ask for two identifiers such as full name and date of birth","Trust the caller ID","Ask only for the first name","Recognize the voice","Using at least two identifiers helps protect privacy and prevents mix-ups."],
+[2,"Which behavior shows active listening?","Facing the patient, making eye contact, and nodding","Typing while the patient talks","Glancing at the clock","Finishing the patient's sentences","Active listening shows attention through body language and by letting the speaker finish."],
+[2,"A patient with limited English proficiency needs help understanding a form. What is the best choice?","Use a qualified medical interpreter","Ask the patient's child to interpret","Speak louder and slower","Use hand gestures only","Qualified interpreters improve accuracy and protect privacy. Using minors or relatives can cause errors."],
+[2,"You leave an appointment reminder on a patient's voicemail. What should the message include?","Practice name, date and time, and a call-back number","The diagnosis","The reason for the visit and test results","Nothing at all","Keep the message to the minimum needed so private health details are not overheard."],
+
+/* 3 HIPAA, confidentiality, ethics */
+[3,"HIPAA stands for:","Health Insurance Portability and Accountability Act","Health Information Privacy and Access Act","Healthcare Insurance Protection and Authorization Act","Hospital Information Protection and Accountability Act","HIPAA was passed in 1996."],
+[3,"Which disclosure of PHI generally does NOT require the patient's written authorization?","Sharing information with another provider for treatment","Sending information to the patient's employer","Giving information to a marketing company","Telling a friend of the patient","HIPAA allows use and disclosure for treatment, payment, and healthcare operations (TPO) without authorization."],
+[3,"The 'minimum necessary' standard means:","Use or share only the amount of PHI needed for the purpose","Share the entire chart whenever anyone asks","Keep records for the minimum number of years","Collect the minimum copay","Minimum necessary limits PHI use and disclosure to what is needed. It does not apply to treatment disclosures between providers."],
+[3,"When must a practice give patients its Notice of Privacy Practices?","At the first service visit, with a good-faith effort to get written acknowledgment","Only if the patient asks","Only to Medicare patients","Once every five years","Providers with a direct treatment relationship give the notice at first service delivery."],
+[3,"Which is a HIPAA violation?","Looking up a coworker's chart out of curiosity","Verifying a patient's identity before releasing information","Shredding printed schedules","Logging off a computer when leaving","Access to PHI must be tied to job duties, even for people you know."],
+[3,"Which is an example of a business associate?","An outside billing company that handles claims containing PHI","A nurse employed by the practice","A patient's relative who helps with appointments","A patient","Business associates perform services involving PHI for a covered entity and must sign a business associate agreement."],
+[3,"You realize you faxed lab results to the wrong number. What should you do?","Notify the privacy officer right away and follow the breach procedure","Do nothing since it was an accident","Wait to see if anyone complains","Re-send it to the right number and say nothing","Misdirected PHI must be reported internally so the practice can evaluate and respond."],
+[3,"A patient is told about the risks and benefits of treatment and refuses it. Respecting that decision honors which ethical principle?","Autonomy","Beneficence","Nonmaleficence","Justice","Autonomy is the right to make one's own decisions."],
+[3,"Which is required for valid informed consent?","The patient understands the risks, benefits, and alternatives and agrees voluntarily","A family member signs even though the patient can decide","The patient is sedated when signing","Verbal agreement is never acceptable under any circumstance","Consent must be informed, voluntary, and given by someone with capacity."],
+[3,"Which is NOT required to prove negligence (malpractice)?","Intent to harm","Duty","Dereliction (breach of duty)","Damages","The four Ds are duty, dereliction, direct cause, and damages. Negligence does not require intent."],
+[3,"Under HIPAA, patients generally have the right to:","Access and obtain a copy of their own health records","Edit their records themselves at any time","Refuse to have any record created","See other patients' records if they are family","Patients have a right of access, and practices generally must respond within 30 days."],
+[3,"Which document tells providers a patient's wishes about life-sustaining treatment if the patient cannot speak for themselves?","Advance directive","Notice of Privacy Practices","Superbill","Explanation of benefits","Living wills and health care powers of attorney are types of advance directives."],
+
+/* 4 Insurance, claims, payment, revenue cycle */
+[4,"A fixed amount a patient pays at the time of an office visit is called a:","Copayment","Deductible","Coinsurance","Premium","Copays are set dollar amounts due at the time of service."],
+[4,"The amount a patient must pay for covered services before insurance begins paying is the:","Deductible","Copayment","Premium","Allowed amount","The deductible resets each plan year."],
+[4,"Which term describes the percentage of covered costs a patient shares with the insurer after the deductible is met?","Coinsurance","Copayment","Premium","Capitation","For example, an 80/20 plan pays 80 percent and the patient pays 20 percent."],
+[4,"The allowed amount is $200, the deductible is already met, and coinsurance is 20 percent. How much does the patient owe?","$40","$160","$20","$80","20 percent of $200 is $40. The insurer pays the remaining $160."],
+[4,"Which claim form do physician offices use for professional services?","CMS-1500","UB-04","W-2","HIPAA authorization form","The UB-04 is the institutional form used by hospitals and facilities."],
+[4,"CPT codes are used to report:","Procedures and services provided","Diagnoses","Patient demographics","Insurance payer ID numbers","ICD-10-CM codes are for diagnoses. CPT and HCPCS codes are for services and supplies."],
+[4,"Prior authorization is:","Approval from the insurer before a service is provided so it will be covered","A form patients sign to release records","A bill sent after the service","A list of in-network providers","Without required prior authorization, a claim can be denied."],
+[4,"An explanation of benefits (EOB) is:","A statement from the insurer showing what was billed, paid, adjusted, and owed by the patient","A bill from the provider","A referral to a specialist","A claim form","EOBs are not bills. They explain how the claim was processed."],
+[4,"A child is covered under both parents' plans. Mother's birthday is April 12 and father's is September 3. Under the birthday rule, which plan is primary?","Mother's plan","Father's plan","The plan with the lower premium","The older parent's plan","The birthday rule looks at month and day, not year. The parent whose birthday comes first in the calendar year has the primary plan."],
+[4,"A clean claim is one that:","Has no errors or missing information and can be processed without further input","Has been paid in full","Was returned by the payer","Has been appealed","Clean claims are paid faster and reduce rework."],
+[4,"Medicaid is best described as:","A joint federal and state program for people with limited income","A federal program only for people age 65 and over","A private insurance company","A workers' compensation program","Medicare is the federal program for people 65 and over and certain people with disabilities."],
+[4,"Insurance eligibility and benefits should be verified:","Before the patient's visit","Only after a claim is denied","Only for new patients after the visit","Never, since the card proves coverage","Verifying up front prevents denials and surprise bills."],
+
+/* 5 Records */
+[5,"Which best describes an electronic health record (EHR)?","A digital record designed to be shared among providers and organizations","A paper chart kept in one office","A billing statement","An appointment calendar","An EMR is the digital chart within one practice. An EHR is built to follow the patient across settings."],
+[5,"How should an error in a paper chart be corrected?","Draw a single line through it, write the correction, then initial and date it","Cover it with correction fluid","Erase it","Tear out the page and rewrite it","The original entry must stay legible so the record keeps its legal integrity."],
+[5,"Using 'nothing comes before something,' which name is filed first alphabetically?","Brown, Carol","Brown, Carole","Brown, Caroline","Browne, Carol","'Carol' ends before 'Carole', and 'Brown' comes before 'Browne'."],
+[5,"In terminal-digit filing, the chart number 48-35-27 is filed first by which digits?","27","48","35","4835","In terminal-digit filing, the last pair of digits is the primary section."],
+[5,"In a SOAP note, a patient's description of symptoms in their own words belongs under:","Subjective","Objective","Assessment","Plan","S = Subjective, O = Objective (measurable findings), A = Assessment, P = Plan."],
+[5,"Who generally owns the physical medical record?","The provider or practice that created it","The patient","The insurance company","The state government","The practice owns the record. The patient owns the right to access the information in it."],
+[5,"A patient's attorney requests copies of the chart. What is needed first?","A signed authorization from the patient","A business card","A verbal request from the attorney","Nothing, since attorneys are exempt","Disclosures outside treatment, payment, and operations normally require the patient's signed authorization."],
+[5,"Which EHR security feature records who viewed or changed a record and when?","Audit trail","Encryption","Firewall","Template","Audit trails support accountability and help detect inappropriate access."],
+[5,"How long a practice must keep medical records is generally set by:","State law and the practice's policies","The patient's preference","The insurance company's preference","The local library","Retention periods vary by state and by patient type, such as minors."],
+[5,"What is the purpose of an out guide in a paper filing system?","To mark where a removed chart has gone","To list the patient's diagnoses","To bill the patient","To record the patient's allergies","The out guide shows who has the chart and when it was removed, so it can be found."],
+[5,"A superbill (encounter form) is used to:","Record the services and diagnoses from a visit for billing","Obtain informed consent","Report a breach","Schedule the next visit","Charge entry starts from the services and diagnoses the provider selects on the encounter form."],
+[5,"Which practice best safeguards paper charts?","Keep them in locked cabinets or a restricted area and out of public view","Leave them at the front desk for convenience","Stack them on a chair in the hallway","Let patients carry their own chart","Physical safeguards limit who can see or take PHI."],
+/* ---- Expansion set ---- */
+[1,"Which task is outside the scope of practice of a medical assistant?","Diagnosing a patient's condition","Measuring blood pressure","Updating the patient's chart","Making appointment reminder calls","Diagnosis and prescribing belong to licensed providers such as physicians, nurse practitioners, and physician assistants."],
+[1,"Scope of practice means:","The tasks a professional is legally allowed to perform based on training and licensure","The geographic area a practice serves","The list of services on the fee schedule","The hours a practice is open","Staff must work within their scope to protect patients and avoid legal risk."],
+[1,"A patient is formally admitted to the hospital for a stay of several days. This patient is an:","Inpatient","Outpatient","Walk-in patient","Ambulatory patient","Inpatients are formally admitted. Outpatients receive care and go home the same day."],
+[1,"Which setting serves people who need ongoing nursing care and help with daily living over an extended period?","Long-term care facility","Urgent care center","Ambulatory surgery center","Outpatient laboratory","Long-term care includes nursing homes and assisted living for people who cannot live independently."],
+[1,"A nurse and a physical therapist visit a patient at their house after surgery. This is:","Home health care","Hospice only","Tertiary care","Urgent care","Home health delivers skilled nursing and therapy services in the patient's home."],
+[1,"A county health department runs a vaccination clinic and tracks disease outbreaks. Its main focus is:","Community and population health","Individual patient billing","Elective surgery","Private concierge care","Public health agencies work to prevent disease and promote health in whole communities."],
+[1,"Which professional helps patients regain movement and strength after an injury or surgery?","Physical therapist","Medical coder","Phlebotomist","Pharmacy technician","Physical therapists design exercise and treatment plans for recovery and mobility."],
+[1,"Which professional's main job is collecting blood specimens?","Phlebotomist","Radiologic technologist","Respiratory therapist","Medical coder","Phlebotomists draw blood for testing and donations."],
+[1,"An organizational chart shows:","Reporting relationships and structure","Patient diagnoses","Insurance fee schedules","Daily appointment times","It shows who reports to whom and how departments are arranged."],
+[1,"A statement that describes why a healthcare organization exists and whom it serves is its:","Mission statement","Fee schedule","Consent form","Superbill","The mission statement guides decisions and culture."],
+[1,"A new employee needs step-by-step instructions for a routine office task. Where should they look?","The policy and procedure manual","The explanation of benefits","A patient's chart","The Notice of Privacy Practices","The policy and procedure manual documents how the office does things."],
+[1,"A group practice is best described as:","Two or more providers who share staff, space, and expenses","A single provider working alone","An insurance company's claims department","A federal agency","Group practices pool resources and often share records and billing systems."],
+[1,"A physician, nurse, pharmacist, and social worker coordinate one patient's care. This is an example of:","An interprofessional team","Chain of command","A clearinghouse","Risk management","Interprofessional teams combine different expertise to improve care."],
+[1,"Which setting is staffed to treat life-threatening conditions 24 hours a day?","Emergency department","Urgent care center","Primary care office","Ambulatory surgery center","Emergency departments handle severe, life-threatening problems at all hours."],
+[1,"Telehealth allows providers to:","Deliver care remotely using video, phone, or other technology","Treat patients only in hospitals","Bill patients without documentation","Skip patient identification","Telehealth expands access, but privacy and documentation rules still apply."],
+
+[2,"A staff member restates a patient's concern in their own words to confirm understanding. This is:","Paraphrasing","Interrupting","Diagnosing","Asking a leading question","Paraphrasing shows listening and catches misunderstandings."],
+[2,"Which is a leading question?","'You haven't missed any doses, have you?'","'What medicines are you taking?'","'How are you feeling today?'","'Can you describe your symptoms?'","Leading questions suggest the expected answer and can distort responses."],
+[2,"A patient arrives 20 minutes late for a 15-minute visit. What is best?","Tell the clinical team and follow the late-arrival policy, which may mean working the patient in or rescheduling","Send the patient back immediately regardless of other patients","Turn the patient away without explanation","Scold the patient in front of others","Follow office policy and communicate respectfully with the patient and clinical team."],
+[2,"A waitlist (cancellation list) is used to:","Offer earlier appointments to patients when openings occur","Track insurance denials","Store patient charts","Record billing codes","Waitlists fill canceled slots and help patients get seen sooner."],
+[2,"Why do you ask the reason for a visit when scheduling?","To allow the right amount of time and preparation","To assign a billing code","To decide whether the patient is insured","To share it with the patient's family","Visit length and room setup depend on the reason for the appointment."],
+[2,"Which is the best professional phone greeting?","'Good morning, Valley Family Medicine, this is Jen. How may I help you?'","'Hello?'","'Yeah, what do you need?'","'Hold on a sec.'","A good greeting names the practice and the speaker and offers help."],
+[2,"Before placing a caller on hold, you should:","Ask permission and wait for the answer","Put the caller on hold without saying anything","Hang up and call back later","Transfer without telling the caller","Courtesy requires asking first and thanking the caller when you return."],
+[2,"Which details are essential in a telephone message?","Caller's name, call-back number, date and time, and reason for the call","Caller's insurance ID and Social Security number","Caller's full medical history","The provider's personal cell number","Messages need enough information for a prompt, accurate return call without collecting unnecessary sensitive data."],
+[2,"Which approach helps when communicating with a patient who has a hearing impairment?","Face the patient, speak clearly at a normal volume, and reduce background noise","Shout across the room","Avoid eye contact","Talk while looking at the computer","Clear speech, lighting on your face, and a quiet setting help. Written notes can also help."],
+[2,"Which action shows cultural sensitivity?","Asking patients about preferences that affect their care instead of assuming","Assuming beliefs based on appearance","Avoiding any discussion of preferences","Telling patients to follow your customs","Asking respectfully avoids stereotypes and supports better care."],
+[2,"At check-in for an established patient, staff should:","Ask whether contact or insurance information has changed","Skip updates because information is already on file","Ask only about the copay","Have the patient write a new history every visit","Regular verification keeps demographics and insurance accurate and prevents denials."],
+[2,"What is the best way to send a patient their lab results electronically?","Through a secure patient portal","In a regular unencrypted email","By text message","By social media direct message","A portal protects privacy and keeps a record of access."],
+[2,"At 4:50 p.m., you have several tasks. Which comes first?","Return a patient's urgent call about a possible medication reaction and notify clinical staff","File lab reports","Restock forms","Update the bulletin board","Patient safety issues take priority over routine tasks."],
+[2,"In scheduling software, a matrix (template) is used to:","Block out times when the provider is unavailable, such as lunch or surgery","Store patient diagnoses","Calculate insurance payments","Track supply orders","The matrix keeps appointments from being booked when the provider is out."],
+
+[3,"Which is a HIPAA covered entity?","A physician practice that bills insurance electronically","A patient's employer","A fitness club","A patient's family member","Covered entities are health plans, healthcare clearinghouses, and providers who transmit health information electronically for standard transactions."],
+[3,"Which is an example of PHI?","A chart listing a patient's name and diagnosis","The total number of patients seen this month, with no names","The practice's phone number","A list of office supply costs","PHI is individually identifiable health information."],
+[3,"What is the best practice for a patient sign-in sheet?","Ask only for name and time, not the reason for the visit","Ask for diagnosis and insurance ID","Leave previous entries visible to everyone","Ask for date of birth and Social Security number","Sign-in sheets can be seen by others, so keep them minimal."],
+[3,"Which practice protects PHI shown on a front desk computer?","Position the screen away from public view and use a privacy screen","Leave the screen on while away","Face the monitor toward the waiting room","Write passwords on a sticky note","Reasonable safeguards limit incidental viewing."],
+[3,"Which is generally acceptable under HIPAA?","Calling a patient's name in the waiting room","Announcing a patient's diagnosis in the waiting room","Discussing a patient's case in the elevator","Leaving a chart open on the counter","Calling a name is an incidental disclosure that is permitted when reasonable safeguards are used."],
+[3,"A patient's husband calls for her test results. No written permission is on file. What should you do?","Not release the results without the patient's permission and offer to have her call or sign a form","Give the results because he is her spouse","Give them if he knows her birth date","Give only partial results","A family relationship alone is not permission. Follow the patient's documented wishes."],
+[3,"A staff member posts about 'the craziest patient today, a teenager with a rare condition' without a name. Is this a problem?","Yes, details can identify the patient and break confidentiality","No, because no name was used","Only if a photo was posted","Only if the post is public for more than a day","Identifiable details, not just names, can reveal a patient, especially in a small community."],
+[3,"Which disclosure of PHI is allowed by law without the patient's authorization?","Reporting suspected child abuse to the proper authorities","Telling a neighbor about a patient's visit","Sending records to a patient's employer","Giving details to a magazine","Mandatory reporting laws override the usual authorization requirement."],
+[3,"Under the HIPAA Breach Notification Rule, affected individuals must be notified without unreasonable delay and no later than:","60 days after discovery","10 days after discovery","6 months after discovery","1 year after discovery","The outer limit is 60 calendar days from discovery of the breach."],
+[3,"HIPAA requires covered entities to keep required privacy policies and related documentation for:","6 years","1 year","3 years","10 years","The six-year period runs from the date of creation or last effective date, whichever is later."],
+[3,"Which agency enforces the HIPAA Privacy Rule?","The HHS Office for Civil Rights","The IRS","OSHA","The FDA","The Office for Civil Rights investigates complaints and can impose penalties."],
+[3,"The HITECH Act:","Encouraged adoption of electronic health records and strengthened HIPAA enforcement and breach notification","Created Medicare","Ended all copayments","Replaced HIPAA","HITECH was passed in 2009 to promote health IT and strengthen privacy protections."],
+[3,"Which statement about ethics and the law is correct?","An action can be legal but still unethical","Every unethical act is illegal","Courts enforce ethics","Laws and ethics are the same thing","Ethics are principles of right conduct, while laws are rules enforced by government."],
+[3,"Telling a patient the truth about an error that occurred in their care honors which ethical principle?","Veracity","Justice","Autonomy","Beneficence","Veracity means being truthful and honest."],
+
+[4,"A payment model in which a provider receives a fixed amount per patient per month regardless of services is called:","Capitation","Fee-for-service","Coinsurance","Deductible","Capitation pays a set amount for each enrolled patient, often through an HMO."],
+[4,"A payment model in which a provider is paid separately for each service performed is called:","Fee-for-service","Capitation","A premium","A copayment","Fee-for-service pays per visit, test, or procedure."],
+[4,"Compared with in-network care, out-of-network care generally means:","Higher out-of-pocket costs for the patient","Lower costs for the patient","That no claim can be filed","That prior authorization is never needed","In-network providers have agreed to contracted rates with the plan."],
+[4,"An HMO patient wants to see a dermatologist. What is usually required?","A referral from the primary care provider","Nothing","A Medicare card","A signed consent to treat","Many HMOs require a PCP referral for specialist visits."],
+[4,"The person who is responsible for paying the patient's bill is the:","Guarantor","Clearinghouse","Provider","Claims adjuster","The guarantor may be the patient or another person, such as a parent."],
+[4,"The person who holds the insurance policy is the:","Subscriber (policyholder)","Guarantor","Provider","Clearinghouse","Dependents are covered through the subscriber's policy."],
+[4,"Which part of Medicare helps cover physician visits and outpatient care?","Part B","Part A","Part D","TRICARE","Part A covers inpatient hospital care, Part B covers medical services, and Part D covers prescription drugs."],
+[4,"Medicare Part A primarily covers:","Inpatient hospital care, short skilled nursing stays, and hospice","Prescription drugs","Physician office visits","Dental cleanings","Part A is often called hospital insurance."],
+[4,"An employee is injured on the job. Which coverage typically pays for the treatment?","Workers' compensation","Medicare","The patient's auto insurance","Medicaid","Workers' compensation covers work-related injuries and illnesses."],
+[4,"A claim is submitted after the payer's filing deadline. What will most likely happen?","It will be denied for untimely filing","It will be paid at double","It will be automatically approved","The payer will wait indefinitely","Payers set timely filing limits, so submit claims promptly."],
+[4,"The difference between the provider's billed charge and the amount allowed by an in-network contract, which the provider writes off, is the:","Contractual adjustment","Copayment","Deductible","Coinsurance","The provider agrees to accept the allowed amount as payment in full from the plan and patient."],
+[4,"A patient has $100 left on the deductible. The allowed amount is $300 and the plan pays 80 percent after the deductible. What does the patient owe?","$140","$60","$100","$240","The patient pays the $100 deductible, then 20 percent of the remaining $200 ($40), for $140. The plan pays $160."],
+[4,"When should copayments be collected?","At check-in, at the time of service","At the end of the year","After the claim is processed","Only if the patient asks","Collecting at the time of service improves collections and reduces billing."],
+[4,"What should be done before billing a patient for a balance after insurance?","Post the insurance payment and confirm the remaining patient responsibility from the EOB or remittance","Bill the full charge right away","Wait for the patient to call","Send the account to collections","Patients should only be billed for what the plan says they owe."],
+[4,"HCPCS Level II codes are used to report:","Supplies, equipment, and certain services not in CPT","Diagnoses","Patient names","Payer ID numbers","Examples include durable medical equipment and ambulance services."],
+
+[5,"Which filing method uses colors to help staff spot misfiled charts quickly?","Color-coded filing","Subject filing","Geographic filing","Chronological filing","A color on the folder tab for each letter or number makes errors easy to see."],
+[5,"A practice gives each new patient the next number in sequence. This is:","Numeric filing","Alphabetic filing","Subject filing","Geographic filing","Numeric filing needs a cross-reference index to find a chart by name."],
+[5,"Which item should NOT be filed in the patient's medical chart?","An internal incident report","A signed consent form","Lab results","A progress note","Incident reports are kept separately for quality and risk management."],
+[5,"Which is an appropriate chart entry?","Patient states, 'My back pain is 7 out of 10.'","Patient is being dramatic.","Patient seems lazy.","Patient is probably lying about pain.","Charting should be objective, factual, and free of opinion and judgment."],
+[5,"A provider forgot to document an event from yesterday. How should it be handled?","Add a late entry labeled with today's date and time and the time it occurred","Backdate the entry to yesterday","Insert it between existing lines with no date","Leave it undocumented","Late entries must be clearly marked so the record stays truthful."],
+[5,"What is the purpose of regular EHR backups?","To restore records after hardware failure or disaster","To track who viewed charts","To increase patient volume","To assign billing codes","Backups protect the availability of records."],
+[5,"Which is the best practice for EHR logins?","Use your own unique login and never share it","Share a login so work goes faster","Write the password on a sticky note on the monitor","Use the same password for every system","Unique credentials make audit trails meaningful."],
+[5,"Staff need to email a patient record to a specialist. What is best?","Use an encrypted or secure method approved by the practice","Use a personal email account","Send it by text message","Send it by social media message","PHI sent electronically must be protected."],
+[5,"How should paper records past their retention period be destroyed?","Shredding, or another method that makes PHI unreadable","Throwing them in the regular trash","Placing them in the recycling bin intact","Giving them to the patient","Destruction must ensure PHI cannot be read or reconstructed."],
+[5,"Why should each release of patient records be logged?","To show what was released, to whom, and when","To increase billing","To replace the audit trail","To delete the original record","Logging supports accountability and the patient's right to an accounting of disclosures."],
+[5,"Two patients are both named Maria Lopez. What is best?","Use a second identifier such as date of birth and flag the charts with an alert","Rely on first names","Merge the charts","Ask one patient to use a nickname","Two identifiers help prevent wrong-patient errors."],
+[5,"A patient believes information in her record is incorrect. She may:","Request an amendment, which the practice may accept or deny with a written explanation","Edit the chart herself","Demand that the chart be destroyed","Do nothing","HIPAA gives patients the right to request amendments. Original entries are not erased."],
+[5,"Which abbreviation is on the Joint Commission's 'Do Not Use' list because it can be mistaken for 0, 4, or cc?","U (for unit)","mg","BP","NPO","Write 'unit' out in full."]
+];
+
+/* Vocabulary: [competency, term, definition] */
+const VOC = [
+[1,"Primary care","First point of contact for routine, preventive, and ongoing health needs, usually from a family or internal medicine provider."],
+[1,"Secondary care","Specialist care, usually reached by referral from a primary care provider."],
+[1,"Tertiary care","Highly specialized, complex care in advanced facilities, such as transplants or major burn units."],
+[1,"Ambulatory care","Outpatient care that does not require an overnight stay."],
+[1,"Hospice","Comfort-focused end-of-life care for people with terminal illness and support for their families."],
+[1,"Skilled nursing facility","Setting that provides round-the-clock nursing and rehabilitation for people who need more care than they can get at home."],
+[1,"Chain of command","The path of authority and communication from employee to supervisor to higher levels of management."],
+[1,"Office manager","Oversees daily operations, staffing, and budgets of a medical practice."],
+[1,"Accountable care organization (ACO)","Group of providers who coordinate care and share responsibility for the quality and cost of care for a patient population."],
+[1,"Patient-centered medical home","Care model in which a primary care team coordinates all of a patient's care."],
+[1,"The Joint Commission","Independent organization that accredits hospitals and other healthcare organizations."],
+[2,"Triage","Sorting patients by the urgency of their needs."],
+[2,"Wave scheduling","Booking several patients at the start of an hour and seeing them in order of arrival."],
+[2,"Stream scheduling","Booking patients at set, evenly spaced times, such as every 20 minutes."],
+[2,"No-show","A patient who misses an appointment without canceling. It is documented in the record."],
+[2,"Open-ended question","A question that cannot be answered with yes or no and invites the patient to explain."],
+[2,"Active listening","Giving full attention through eye contact, nodding, and not interrupting."],
+[2,"Medical interpreter","Trained professional who converts spoken language between a provider and a patient with limited English."],
+[2,"Double booking","Scheduling two patients for the same appointment time."],
+[2,"Appointment reminder","Call, text, or message that confirms the date and time, with only minimal health information."],
+[3,"HIPAA","1996 federal law that protects the privacy and security of health information and sets standards for its use and disclosure."],
+[3,"PHI","Protected health information: individually identifiable health information held or sent by a covered entity."],
+[3,"Minimum necessary","Standard that limits PHI use and disclosure to what is needed for the purpose."],
+[3,"Notice of Privacy Practices","Document explaining how a practice uses PHI and describing patient privacy rights."],
+[3,"Business associate","Outside person or company that handles PHI for a covered entity, under a signed agreement."],
+[3,"Informed consent","Patient's voluntary agreement to care after learning the risks, benefits, and alternatives."],
+[3,"Autonomy","The ethical principle that patients have the right to make their own decisions."],
+[3,"Beneficence","The ethical principle of acting in the patient's best interest and doing good."],
+[3,"Nonmaleficence","The ethical principle of doing no harm."],
+[3,"Advance directive","Legal document stating a patient's wishes for care if they cannot speak for themselves."],
+[3,"Negligence","Failure to act as a reasonably prudent person would, shown by duty, dereliction, direct cause, and damages."],
+[3,"Breach","Unauthorized acquisition, access, use, or disclosure of PHI that compromises its privacy or security."],
+[4,"Copayment","Fixed dollar amount a patient pays at the time of service."],
+[4,"Deductible","Amount a patient pays for covered services each plan year before the insurer starts paying."],
+[4,"Coinsurance","Percentage of covered costs the patient pays after the deductible is met."],
+[4,"Premium","Regular payment, often monthly, to keep insurance coverage active."],
+[4,"Out-of-pocket maximum","Most a patient pays in a plan year for covered in-network services. After that the plan pays 100 percent."],
+[4,"Prior authorization","Insurer's approval, obtained before a service, for it to be covered."],
+[4,"Explanation of benefits (EOB)","Insurer's statement showing what was billed, paid, adjusted, and owed by the patient. It is not a bill."],
+[4,"CMS-1500","Standard claim form for professional services."],
+[4,"UB-04","Standard claim form used by hospitals and other facilities."],
+[4,"ICD-10-CM","Code set used to report diagnoses."],
+[4,"CPT","Code set used to report medical procedures and services."],
+[4,"Clean claim","Claim with no errors or missing information that can be processed without more input."],
+[4,"Clearinghouse","Intermediary that checks electronic claims and forwards them to payers."],
+[4,"Coordination of benefits","Process that decides which of two or more insurance plans pays first."],
+[4,"Accounts receivable","Money owed to the practice for services already provided."],
+[4,"HMO","Plan that generally requires in-network providers, a primary care provider, and referrals to specialists."],
+[4,"PPO","Plan with a provider network that lets patients see specialists without a referral and costs less in network."],
+[4,"Medicare","Federal health insurance for people 65 and over and certain people with disabilities."],
+[4,"Medicaid","Joint federal and state program that covers people with limited income."],
+[5,"EHR","Electronic health record: digital record designed to be shared among providers and organizations."],
+[5,"Audit trail","Log of who accessed or changed a record and when."],
+[5,"SOAP note","Documentation format: Subjective, Objective, Assessment, Plan."],
+[5,"Terminal-digit filing","Numeric filing method in which the last digits of the chart number determine the primary section."],
+[5,"Out guide","Placeholder that marks where a removed chart has gone."],
+[5,"Superbill","Encounter form listing services and diagnoses for a visit, used to start billing."],
+[5,"Authorization for release","Patient's signed permission to disclose PHI for purposes other than treatment, payment, or operations."],
+[5,"Retention","How long records must be kept before they can be destroyed, set by state law and practice policy."],
+[5,"Source-oriented record","Chart organized by source of information, such as labs, imaging, and progress notes together."],
+[5,"Problem-oriented record","Chart organized around each of the patient's health problems."]
+];
+
+/* Scenarios */
+const SC = [
+{t:"Monday, 8:00 a.m. at the front desk",c:"Patient interaction",intro:"The waiting room is full, the phone is ringing, and the provider is running behind.",steps:[
+ ["Mr. Lopez has waited 40 minutes and says loudly, 'This is unacceptable.' What do you do first?","Speak calmly, acknowledge his frustration, apologize, and give him an honest update on when he will be seen","Tell him the provider is busy and everyone has to wait","Ask him to sit down and stop making a scene","Offer him another patient's earlier time slot","Calm, empathetic, honest communication de-escalates. Never trade one patient's slot for another's."],
+ ["A caller says her husband has crushing chest pain and is sweating. What is your first action?","Tell her to call 911 immediately and alert clinical staff","Put her on hold and look for a nurse","Ask for his insurance information","Offer an appointment for tomorrow","Possible heart attack. Get emergency help first and involve clinical staff right away."],
+ ["A woman says she is Mrs. Kim's neighbor and asks when Mrs. Kim's next appointment is. How do you respond?","Explain that you cannot share or confirm any information about patients without permission","Tell her the date since it is only an appointment","Confirm that Mrs. Kim is a patient but give no date","Ask her what condition Mrs. Kim has","Even confirming that someone is a patient discloses PHI. Share only with permission or when allowed by law."]
+]},
+{t:"A new patient with new insurance",c:"Insurance and revenue cycle",intro:"Ana Reyes is scheduled for Friday and has just changed insurance plans.",steps:[
+ ["What should happen before Friday's visit?","Verify eligibility and benefits with the insurer and copy both sides of the card and a photo ID","Wait to see if the claim is denied","Ask the patient to call the insurer and report back","Assume the coverage is active","Verifying eligibility and benefits ahead of time prevents denials and surprise bills."],
+ ["Billed charge: $250. In-network allowed amount: $180. The deductible is met, and the plan pays 80 percent of the allowed amount. What is the contractual adjustment (write-off)?","$70","$36","$144","$250","$250 − $180 = $70 written off. The insurer pays $144 and the patient owes $36."],
+ ["The claim is denied with the reason 'service not authorized.' What is the best next step?","Check whether prior authorization was required, then appeal or resubmit with the right documentation","Bill the patient in full right away without review","Write off the entire balance","Resubmit the same claim again with no changes","Find the root cause first. Repeating the same claim wastes time and bypasses the fix."]
+]},
+{t:"A privacy incident",c:"HIPAA and ethics",intro:"Three things happen in one afternoon. Each one tests your HIPAA judgment.",steps:[
+ ["You discover that a fax containing lab results went to the wrong number. What do you do?","Notify the privacy officer right away and follow the breach procedure","Ignore it because it was an honest mistake","Wait to see if anyone complains","Send it again and say nothing","The practice must evaluate every possible breach. Report internally right away."],
+ ["You see a coworker open the chart of a neighbor who is not her patient. What should you do?","Report it to your supervisor or privacy officer following policy","Do nothing since she is a coworker","Confront her loudly in front of patients","Open the chart yourself to check","Snooping is a violation even without sharing. Use the reporting process."],
+ ["A patient asks for a copy of her own records. What is correct?","She has a right of access. Verify her identity, have her complete the practice's request process, and respond within 30 days","Refuse because the practice owns the chart","Tell her only her lawyer may request them","Give her the original chart to take home","Patients have a right of access to a copy. The practice keeps the original."]
+]},
+{t:"Squeezing in a busy schedule",c:"Scheduling and workflow",intro:"The provider's day is full. Patients call, cancel, and miss visits.",steps:[
+ ["A mother calls: her toddler has a fever and an earache. The day is full. What is the best step?","Triage per protocol and offer a reserved same-day slot or the provider's guidance","Tell her the next opening is in two weeks","Send her to the emergency room regardless of symptoms","Double book without asking anyone","Triage decides urgency. Many offices reserve same-day slots for this."],
+ ["A patient misses a third appointment. What should you do?","Document each no-show and follow the practice's no-show policy","Remove the no-shows from the chart","Refuse to ever schedule the patient again on your own","Ignore it","Document every missed visit and follow policy, which may involve the provider."],
+ ["A patient calls to cancel a 2:00 p.m. appointment. What is best?","Offer to reschedule, document the cancellation, and offer the open slot to a waiting patient","Tell the patient it is too late to cancel","Leave the slot empty","Delete the patient from the schedule permanently","Documenting and refilling the slot keeps the schedule productive."]
+]},
+{t:"In the chart room",c:"Records management",intro:"A medical assistant brings you three records questions during cleanup.",steps:[
+ ["A wrong date of birth was written in a paper chart. How is it corrected?","Draw a single line through it, write the correct date, then initial and date the change","Cover it with correction fluid","Erase it","Remove and replace the page","Corrections must keep the original entry readable."],
+ ["Which chart is filed first alphabetically: Garcia, Ana; Garcia-Lopez, Ben; or Garza, Cal?","Garcia, Ana","Garcia-Lopez, Ben","Garza, Cal","They are all filed together","'Garcia' is shorter than 'Garcia-Lopez' (nothing before something). Both come before 'Garza'."],
+ ["The provider takes a chart to dictate notes. What should go in its place?","An out guide showing who has the chart and when it was taken","Nothing","A copy of the patient's insurance card","A sticky note on the shelf","An out guide lets staff find a chart quickly."]
+]}
+];
+
+const COMP = {
+ 1:"Roles & Settings",
+ 2:"Patient Interaction & Scheduling",
+ 3:"HIPAA & Ethics",
+ 4:"Insurance & Revenue Cycle",
+ 5:"Records Management"
+};
+const COMP_LONG = {
+ 1:"Medical office roles, healthcare delivery settings, and organizational structures",
+ 2:"Patient interaction, appointment scheduling, and front office workflow",
+ 3:"HIPAA, patient confidentiality, and ethical guidelines",
+ 4:"Insurance verification, claims, payment collection, and revenue cycle",
+ 5:"Organizing, maintaining, and safeguarding records and documentation"
+};
+
+</script>
+<script>
+(function(){
+"use strict";
+var $app=document.getElementById('app'), $nav=document.getElementById('nav');
+var TABS=[["home","Home"],["practice","Practice"],["cards","Flashcards"],["match","Match"],["scen","Scenarios"],["mock","Mock Exam"]];
+var view="home", S={}, P={q:{},mock:[]}, tick=null;
+var LET="ABCD";
+function load(){try{var r=localStorage.getItem("bpa690");if(r){var o=JSON.parse(r);if(o&&o.q)P=o;if(!P.mock)P.mock=[]}}catch(e){}}
+function save(){try{localStorage.setItem("bpa690",JSON.stringify(P))}catch(e){}}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function ids(c){var r=[];QB.forEach(function(q,i){if(!c||q[0]===c)r.push(i)});return r}
+function mkopts(id){var q=QB[id];return shuffle([0,1,2,3]).map(function(k){return{t:q[2+k],ok:k===0}})}
+function bar(p,cls){return '<div class="bar '+(cls||'')+'"><i style="width:'+Math.round(p)+'%"></i></div>'}
+function compChips(sel,act){var h='<div class="chips" role="group" aria-label="Competency">';
+  h+='<button class="chip" data-a="'+act+'" data-c="0" aria-pressed="'+(sel===0)+'">All five</button>';
+  for(var c=1;c<=5;c++)h+='<button class="chip" data-a="'+act+'" data-c="'+c+'" aria-pressed="'+(sel===c)+'">'+c+'. '+COMP[c]+'</button>';
+  return h+'</div>'}
+function go(v){if(tick){clearInterval(tick);tick=null}view=v;S={};render();window.scrollTo(0,0)}
+
+function render(){
+  $nav.innerHTML=TABS.map(function(t){return '<button data-a="go" data-v="'+t[0]+'"'+(t[0]===view?' aria-current="page"':'')+'>'+t[1]+'</button>'}).join('');
+  var f=V[view];$app.innerHTML=f();
+}
+
+var V={};
+
+/* HOME */
+V.home=function(){
+  var h='<div class="row between"><div><h2>Where you stand</h2><p class="muted">Progress is saved in this browser only. Bars show questions answered correctly the last time you tried them.</p></div>'+
+    '<button class="btn" data-a="go" data-v="mock">Take a mock exam</button></div><div class="grid">';
+  for(var c=1;c<=5;c++){var L=ids(c),n=L.length,ok=0,tr=0;L.forEach(function(i){if(P.q[i]!==undefined){tr++;if(P.q[i]===1)ok++}});
+    h+='<div class="card"><span class="label">Competency '+c+'</span><h3>'+COMP[c]+'</h3><p class="muted" style="font-size:15px">'+COMP_LONG[c]+'</p>'+
+      bar(ok/n*100,ok===n?'good':'')+'<div class="stat">'+ok+' of '+n+' correct · '+tr+' tried</div>'+
+      '<div class="row"><button class="btn sm" data-a="startPractice" data-c="'+c+'">Practice</button><button class="btn sm ghost" data-a="cardsFor" data-c="'+c+'">Flashcards</button></div></div>'}
+  h+='</div>';
+  if(P.mock.length){var m=P.mock.slice(-3).reverse();h+='<div><h3>Recent mock exams</h3><div class="stat" style="display:flex;flex-direction:column;gap:4px;margin-top:8px">'+
+    m.map(function(x){return '<span>'+esc(x.date)+' · '+x.mode+' · '+x.score+'/'+x.total+' ('+Math.round(x.score/x.total*100)+'%)</span>'}).join('')+'</div></div>'}
+  h+='<div class="card"><h3>How to use this with a team</h3><p style="font-size:16px">Flashcards and Match build vocabulary. Practice by competency finds weak spots. Scenarios train judgment calls. Finish with a timed mock exam with no notes, just like the event.</p></div>';
+  return h};
+
+/* PRACTICE */
+V.practice=function(){
+  if(!S.stage)S={stage:"setup",comp:0,mode:"all"};
+  if(S.stage==="setup"){
+    var n=poolFor(S.comp,S.mode).length;
+    return '<div><h2>Practice by competency</h2><p class="muted">Instant feedback after every answer.</p></div>'+compChips(S.comp,"pcomp")+
+      '<div class="chips" role="group" aria-label="Which questions"><button class="chip" data-a="pmode" data-m="all" aria-pressed="'+(S.mode==="all")+'">All questions</button>'+
+      '<button class="chip" data-a="pmode" data-m="weak" aria-pressed="'+(S.mode==="weak")+'">Missed or not tried yet</button></div>'+
+      '<div class="row"><button class="btn" data-a="pstart"'+(n?'':' disabled')+'>Start ('+n+' questions)</button></div>'+(n?'':'<p class="muted">Everything here is answered correctly. Try All questions.</p>')};
+  if(S.stage==="run"){
+    var it=S.list[S.i],q=QB[it.id],h='<div class="row between"><span class="stat">Question '+(S.i+1)+' of '+S.list.length+'</span><span class="tag">'+COMP[q[0]]+'</span></div>'+bar(S.i/S.list.length*100)+
+      '<p class="qtext">'+esc(q[1])+'</p><div class="opts">';
+    it.opts.forEach(function(o,k){var cls='';if(S.pick!==null){if(o.ok)cls=' ok';else if(k===S.pick)cls=' no'}
+      h+='<button class="opt'+cls+'" data-a="ppick" data-k="'+k+'"'+(S.pick!==null?' disabled':'')+'><span class="k">'+LET[k]+'</span><span>'+esc(o.t)+'</span></button>'});
+    h+='</div>';
+    if(S.pick!==null){var ok=it.opts[S.pick].ok;
+      h+='<div class="fb '+(ok?'ok':'no')+'" role="status"><b>'+(ok?'Correct.':'Not quite.')+'</b><span>'+esc(q[6])+'</span></div>'+
+        '<div class="row"><button class="btn" data-a="pnext">'+(S.i+1<S.list.length?'Next question':'See results')+'</button></div>'}
+    return h}
+  var right=S.list.filter(function(x){return x.ok}).length,miss=S.list.filter(function(x){return !x.ok});
+  var h='<div><h2>Round complete</h2><p class="score">'+right+'<span class="muted" style="font-size:28px"> / '+S.list.length+'</span></p></div>'+bar(right/S.list.length*100,'good');
+  if(miss.length){h+='<div><h3>Review what you missed</h3>';miss.forEach(function(x){var q=QB[x.id];h+='<div class="review"><p><b>'+esc(q[1])+'</b></p><p>Answer: '+esc(q[2])+'</p><p class="muted" style="font-size:15px">'+esc(q[6])+'</p></div>'});h+='</div>'}
+  h+='<div class="row">'+(miss.length?'<button class="btn" data-a="pretry">Retry missed ('+miss.length+')</button>':'')+'<button class="btn ghost" data-a="go" data-v="practice">New round</button></div>';
+  return h};
+function poolFor(c,mode){return ids(c).filter(function(i){return mode==="all"||P.q[i]!==1})}
+function startList(list){S={stage:"run",list:shuffle(list).map(function(id){return{id:id,opts:mkopts(id),ok:null}}),i:0,pick:null};render()}
+
+/* FLASHCARDS */
+V.cards=function(){
+  if(S.deck===undefined){S={comp:0,deck:null,i:0,flip:false,review:[]};}
+  if(!S.deck){S.deck=shuffle(VOC.map(function(v,i){return i}).filter(function(i){return !S.comp||VOC[i][0]===S.comp}));S.i=0;S.flip=false;S.review=[]}
+  var d=S.deck;
+  if(!d.length)return compChips(S.comp,"ccomp")+'<p>No cards.</p>';
+  var done=S.i>=d.length;
+  var h='<div><h2>Flashcards</h2><p class="muted">Tap the card or press Space to flip. Arrow keys move between cards.</p></div>'+compChips(S.comp,"ccomp");
+  if(done){h+='<div class="card"><h3>Deck finished</h3><p>'+(d.length-S.review.length)+' known, '+S.review.length+' to review.</p><div class="row">'+
+    (S.review.length?'<button class="btn" data-a="creview">Study the '+S.review.length+' to review</button>':'')+'<button class="btn ghost" data-a="crestart">Shuffle and restart</button></div></div>';return h}
+  var v=VOC[d[S.i]];
+  h+='<div class="row between"><span class="stat">Card '+(S.i+1)+' of '+d.length+'</span><span class="tag">'+COMP[v[0]]+'</span></div>'+bar(S.i/d.length*100)+
+    '<button class="flash'+(S.flip?' back':'')+'" data-a="cflip" aria-label="Flashcard, press to flip">'+
+    (S.flip?'<span class="label">Definition</span><span class="def">'+esc(v[2])+'</span>':'<span class="label">Term</span><span class="big">'+esc(v[1])+'</span>')+'</button>'+
+    '<div class="row"><button class="btn ghost" data-a="cprev"'+(S.i?'':' disabled')+'>Back</button>'+
+    '<button class="btn ghost" data-a="cagain">Review again</button><button class="btn" data-a="cknow">I know it</button></div>';
+  return h};
+
+/* MATCH */
+V.match=function(){
+  if(!S.stage)S={stage:"setup",comp:0};
+  if(S.stage==="setup")return '<div><h2>Match the term</h2><p class="muted">Six terms and six definitions. Tap one of each to pair them. Fewer misses and a faster time is a better round.</p></div>'+compChips(S.comp,"mcomp")+
+    '<div class="row"><button class="btn" data-a="mstart">Start round</button></div>';
+  if(S.stage==="done"){var el=Math.round((S.end-S.start)/1000);
+    return '<div><h2>Round complete</h2><p class="score">'+el+'<span class="muted" style="font-size:28px">s</span></p><p class="muted">'+S.miss+' wrong '+(S.miss===1?'pair':'pairs')+'</p></div><div class="row"><button class="btn" data-a="mstart">Next round</button><button class="btn ghost" data-a="go" data-v="match">Change competency</button></div>'}
+  var h='<div class="row between"><span class="stat">'+S.done.length+' of '+S.pairs.length+' matched</span><span class="stat">'+S.miss+' wrong</span></div>'+bar(S.done.length/S.pairs.length*100,'good')+'<div class="mgrid"><div class="mcol">';
+  S.L.forEach(function(p){var d=S.done.indexOf(p)>-1;h+='<button class="m'+(d?' done':'')+(S.sl===p?' sel':'')+(S.bad&&S.bad[0]===p?' bad shake':'')+'" data-a="mpick" data-s="l" data-p="'+p+'"'+(d?' disabled':'')+'><b>'+esc(VOC[p][1])+'</b></button>'});
+  h+='</div><div class="mcol">';
+  S.R.forEach(function(p){var d=S.done.indexOf(p)>-1;h+='<button class="m'+(d?' done':'')+(S.sr===p?' sel':'')+(S.bad&&S.bad[1]===p?' bad shake':'')+'" data-a="mpick" data-s="r" data-p="'+p+'"'+(d?' disabled':'')+'>'+esc(VOC[p][2])+'</button>'});
+  return h+'</div></div>'};
+
+/* SCENARIOS */
+V.scen=function(){
+  if(S.n===undefined)S={n:null};
+  if(S.n===null){var h='<div><h2>Scenario drills</h2><p class="muted">Short stories with three decisions each. These test judgment, the way the harder exam questions do.</p></div><div class="opts">';
+    SC.forEach(function(s,i){h+='<button class="scn" data-a="sopen" data-n="'+i+'"><span class="tag gold">'+s.c+'</span><h3>'+esc(s.t)+'</h3><span class="muted" style="font-size:15px">'+esc(s.intro)+'</span></button>'});return h+'</div>'}
+  var s=SC[S.n];
+  if(S.i>=s.steps.length){return '<div><span class="label">'+esc(s.t)+'</span><h2>Scenario complete</h2><p class="score">'+S.right+'<span class="muted" style="font-size:28px"> / '+s.steps.length+'</span></p></div><div class="row"><button class="btn" data-a="sopen" data-n="'+S.n+'">Replay</button><button class="btn ghost" data-a="go" data-v="scen">All scenarios</button></div>'}
+  var st=s.steps[S.i],o=S.opts;
+  var h='<div class="row between"><span class="label">'+esc(s.t)+'</span><span class="stat">Decision '+(S.i+1)+' of '+s.steps.length+'</span></div><p class="muted">'+esc(s.intro)+'</p><p class="qtext">'+esc(st[0])+'</p><div class="opts">';
+  o.forEach(function(x,k){var cls='';if(S.pick!==null){if(x.ok)cls=' ok';else if(k===S.pick)cls=' no'}
+    h+='<button class="opt'+cls+'" data-a="spick" data-k="'+k+'"'+(S.pick!==null?' disabled':'')+'><span class="k">'+LET[k]+'</span><span>'+esc(x.t)+'</span></button>'});
+  h+='</div>';
+  if(S.pick!==null){var ok=o[S.pick].ok;h+='<div class="fb '+(ok?'ok':'no')+'" role="status"><b>'+(ok?'Good call.':'Not the best choice.')+'</b><span>'+esc(st[6-1])+'</span></div><div class="row"><button class="btn" data-a="snext">'+(S.i+1<s.steps.length?'Next decision':'Finish')+'</button></div>'}
+  return h};
+
+/* MOCK EXAM */
+V.mock=function(){
+  if(!S.stage)S={stage:"setup"};
+  if(S.stage==="setup"){return '<div><h2>Timed mock exam</h2><p class="muted">Closed book, no feedback until you submit. Questions are drawn evenly from all five competencies. Allow about 1.2 minutes per question, which matches a 60 minute test of 50 questions.</p></div>'+
+    '<div class="grid"><div class="card"><h3>Full mock</h3><p>50 questions · 60 minutes</p><button class="btn" data-a="mstartx" data-n="10">Start full mock</button></div>'+
+    '<div class="card"><h3>Quick mock</h3><p>20 questions · 24 minutes</p><button class="btn ghost" data-a="mstartx" data-n="4">Start quick mock</button></div></div>'+
+    '<p class="muted" style="font-size:15px">Bring a cordless calculator if you like. Several revenue cycle questions use simple percentages.</p>'}
+  if(S.stage==="run"){
+    var it=S.list[S.i],q=QB[it.id];
+    var h='<div class="row between"><span class="stat">Question '+(S.i+1)+' of '+S.list.length+'</span><span class="timer" id="timer" role="timer">'+fmt(rem())+'</span></div>'+
+      '<div class="nav-q" aria-label="Question navigator">'+S.list.map(function(x,k){return '<button class="nq'+(x.pick!==null?' ans':'')+(k===S.i?' cur':'')+(x.flag?' flag':'')+'" data-a="mgo" data-k="'+k+'" aria-label="Question '+(k+1)+(x.pick!==null?', answered':'')+(x.flag?', flagged':'')+'">'+(k+1)+'</button>'}).join('')+'</div>'+
+      '<p class="qtext">'+esc(q[1])+'</p><div class="opts">';
+    it.opts.forEach(function(o,k){h+='<button class="opt'+(it.pick===k?' sel':'')+'" data-a="mpickx" data-k="'+k+'"><span class="k">'+LET[k]+'</span><span>'+esc(o.t)+'</span></button>'});
+    h+='</div><div class="row between"><div class="row"><button class="btn ghost" data-a="mprev"'+(S.i?'':' disabled')+'>Back</button><button class="btn ghost" data-a="mnext"'+(S.i<S.list.length-1?'':' disabled')+'>Next</button>'+
+      '<button class="btn ghost" data-a="mflag" aria-pressed="'+!!it.flag+'">'+(it.flag?'Unflag':'Flag for review')+'</button></div><button class="btn" data-a="msubmit">Submit exam</button></div>';
+    if(S.confirm){var un=S.list.filter(function(x){return x.pick===null}).length;
+      h+='<div class="confirm" role="alertdialog"><b>'+(un?un+' unanswered question'+(un>1?'s':'')+'.':'All questions answered.')+' Submit now?</b><div class="row"><button class="btn" data-a="mfinal">Yes, submit</button><button class="btn ghost" data-a="mcancel">Keep working</button></div></div>'}
+    return h}
+  var sc=0,by={1:[0,0],2:[0,0],3:[0,0],4:[0,0],5:[0,0]};
+  S.list.forEach(function(x){var ok=x.pick!==null&&x.opts[x.pick].ok;var c=QB[x.id][0];by[c][1]++;if(ok){sc++;by[c][0]++}});
+  var h='<div><span class="label">'+S.mode+' · '+(S.timeup?'time expired':'submitted')+'</span><h2>Results</h2><p class="score">'+sc+'<span class="muted" style="font-size:28px"> / '+S.list.length+' ('+Math.round(sc/S.list.length*100)+'%)</span></p></div>'+bar(sc/S.list.length*100,'good')+'<h3>By competency</h3><div style="display:flex;flex-direction:column;gap:10px">';
+  for(var c=1;c<=5;c++){var p=by[c][1]?by[c][0]/by[c][1]*100:0;h+='<div class="crow"><span class="n">'+c+'. '+COMP[c]+'</span>'+bar(p,p>=80?'good':'')+'<span class="v">'+by[c][0]+'/'+by[c][1]+'</span></div>'}
+  h+='</div><h3>Review your misses</h3>';
+  var miss=S.list.filter(function(x){return x.pick===null||!x.opts[x.pick].ok});
+  if(!miss.length)h+='<p>Perfect score. No misses to review.</p>';
+  miss.forEach(function(x){var q=QB[x.id];h+='<div class="review"><span class="tag">'+COMP[q[0]]+'</span><p><b>'+esc(q[1])+'</b></p><p>'+(x.pick===null?'<span class="muted">Not answered.</span>':'Your answer: '+esc(x.opts[x.pick].t))+'</p><p style="color:var(--good)">Correct: '+esc(q[2])+'</p><p class="muted" style="font-size:15px">'+esc(q[6])+'</p></div>'});
+  h+='<div class="row"><button class="btn" data-a="go" data-v="mock">New mock exam</button><button class="btn ghost" data-a="go" data-v="practice">Practice weak areas</button></div>';
+  return h};
+function rem(){return Math.max(0,Math.round((S.end-Date.now())/1000))}
+function fmt(s){var m=Math.floor(s/60),r=s%60;return m+":"+(r<10?"0":"")+r}
+function finishMock(timeup){
+  if(tick){clearInterval(tick);tick=null}
+  var sc=S.list.filter(function(x){return x.pick!==null&&x.opts[x.pick].ok}).length;
+  S.list.forEach(function(x){P.q[x.id]=(x.pick!==null&&x.opts[x.pick].ok)?1:0});
+  P.mock.push({date:new Date().toLocaleDateString(),mode:S.mode,score:sc,total:S.list.length});if(P.mock.length>20)P.mock.shift();save();
+  S.stage="done";S.timeup=timeup;S.confirm=false;render();window.scrollTo(0,0)}
+
+/* ACTIONS */
+var A={
+ go:function(d){go(d.v)},
+ startPractice:function(d){view="practice";S={stage:"setup",comp:+d.c,mode:"all"};render();pstartNow()},
+ pcomp:function(d){S.comp=+d.c;render()},
+ pmode:function(d){S.mode=d.m;render()},
+ pstart:function(){pstartNow()},
+ ppick:function(d){if(S.pick!==null)return;S.pick=+d.k;var it=S.list[S.i];it.ok=it.opts[S.pick].ok;P.q[it.id]=it.ok?1:0;save();render()},
+ pnext:function(){S.i++;S.pick=null;if(S.i>=S.list.length)S.stage="done";render();window.scrollTo(0,0)},
+ pretry:function(){startList(S.list.filter(function(x){return !x.ok}).map(function(x){return x.id}))},
+ cardsFor:function(d){view="cards";S={comp:+d.c,deck:null,i:0,flip:false,review:[]};render();window.scrollTo(0,0)},
+ ccomp:function(d){S={comp:+d.c,deck:null,i:0,flip:false,review:[]};render()},
+ cflip:function(){S.flip=!S.flip;render()},
+ cknow:function(){S.i++;S.flip=false;render()},
+ cagain:function(){var id=S.deck[S.i];if(S.review.indexOf(id)<0)S.review.push(id);S.i++;S.flip=false;render()},
+ cprev:function(){if(S.i>0){S.i--;S.flip=false;render()}},
+ creview:function(){S.deck=shuffle(S.review);S.review=[];S.i=0;S.flip=false;render()},
+ crestart:function(){S.deck=null;render()},
+ mcomp:function(d){S.comp=+d.c;render()},
+ mstart:function(){
+   var pool=VOC.map(function(v,i){return i}).filter(function(i){return !S.comp||VOC[i][0]===S.comp});
+   var pairs=shuffle(pool).slice(0,6);
+   S={stage:"run",comp:S.comp,pairs:pairs,L:shuffle(pairs),R:shuffle(pairs),done:[],sl:null,sr:null,miss:0,start:Date.now(),bad:null};render()},
+ mpick:function(d){
+   if(S.bad)return;var p=+d.p;if(d.s==="l")S.sl=(S.sl===p?null:p);else S.sr=(S.sr===p?null:p);
+   if(S.sl!==null&&S.sr!==null){
+     if(S.sl===S.sr){S.done.push(S.sl);S.sl=S.sr=null;if(S.done.length===S.pairs.length){S.end=Date.now();S.stage="done"}}
+     else{S.miss++;S.bad=[S.sl,S.sr];S.sl=S.sr=null;render();setTimeout(function(){if(view==="match"){S.bad=null;render()}},450);return}}
+   render()},
+ sopen:function(d){var s=SC[+d.n];S={n:+d.n,i:0,right:0,pick:null};scenOpts();render();window.scrollTo(0,0)},
+ spick:function(d){if(S.pick!==null)return;S.pick=+d.k;if(S.opts[S.pick].ok)S.right++;render()},
+ snext:function(){S.i++;S.pick=null;if(S.i<SC[S.n].steps.length)scenOpts();render();window.scrollTo(0,0)},
+ mstartx:function(d){
+   var per=+d.n,list=[];for(var c=1;c<=5;c++)list=list.concat(shuffle(ids(c)).slice(0,per));
+   var secs=Math.round(list.length*72);
+   S={stage:"run",mode:per===10?"Full mock":"Quick mock",list:shuffle(list).map(function(id){return{id:id,opts:mkopts(id),pick:null,flag:false}}),i:0,end:Date.now()+secs*1000,confirm:false};
+   render();window.scrollTo(0,0);
+   tick=setInterval(function(){var t=document.getElementById('timer');if(!t||view!=="mock"||S.stage!=="run"){return}
+     var r=rem();t.textContent=fmt(r);t.className="timer"+(r<=300?" low":"");if(r<=0)finishMock(true)},1000)},
+ mpickx:function(d){S.list[S.i].pick=+d.k;S.confirm=false;render()},
+ mgo:function(d){S.i=+d.k;render()},
+ mprev:function(){if(S.i>0){S.i--;render()}},
+ mnext:function(){if(S.i<S.list.length-1){S.i++;render()}},
+ mflag:function(){S.list[S.i].flag=!S.list[S.i].flag;render()},
+ msubmit:function(){S.confirm=true;render()},
+ mcancel:function(){S.confirm=false;render()},
+ mfinal:function(){finishMock(false)}
+};
+function pstartNow(){var l=poolFor(S.comp,S.mode);if(l.length)startList(l)}
+function scenOpts(){var st=SC[S.n].steps[S.i];S.opts=shuffle([0,1,2,3]).map(function(k){return{t:st[1+k],ok:k===0}})}
+
+document.addEventListener("click",function(e){var t=e.target.closest("[data-a]");if(!t||t.disabled)return;var f=A[t.dataset.a];if(f)f(t.dataset)});
+document.addEventListener("keydown",function(e){
+  if(view!=="cards"||!S.deck||S.i>=S.deck.length)return;
+  if(e.target.closest&&e.target.closest("button")&&e.key===" ")return;
+  if(e.key===" "){e.preventDefault();A.cflip()}
+  else if(e.key==="ArrowRight"){A.cknow()}
+  else if(e.key==="ArrowLeft"){A.cprev()}});
+
+load();render();
+})();
+</script>
+
+</body>
+</html>
